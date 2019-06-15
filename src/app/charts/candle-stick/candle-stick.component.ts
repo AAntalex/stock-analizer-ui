@@ -112,7 +112,7 @@ export class CandleStickComponent implements OnInit {
         if (dataChart.length > 0) {
           const lastDate = dataChart[dataChart.length - 1].date;
           for (i = 0; i < this.chart.series.length; i += 1) {
-            let lastIdx = this.chart.series[i].xData.length - 1;
+            const lastIdx = this.chart.series[i].xData.length - 1;
             if (lastIdx >= 0 && this.chart.series[i].xData[lastIdx] === dataChart[0].date) {
               this.chart.series[i].removePoint(lastIdx, false);
             }

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ProgressService } from 'src/app/services/progress.service';
-import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-progress',
