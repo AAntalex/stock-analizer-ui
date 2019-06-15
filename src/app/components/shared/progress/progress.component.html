@@ -1,0 +1,4 @@
+<div *ngIf="progressSerivce.isProgress | async" class="cdk-overlay-container">
+  <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing"></div>
+  <mat-progress-spinner class="spinner" [color]="color" [mode]="mode" [value]="value"></mat-progress-spinner>
+</div>

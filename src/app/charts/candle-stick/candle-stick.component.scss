@@ -1,0 +1,15 @@
+@import "../../../styles.scss";
+
+.chart_div {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  top: 24px;
+}
+
+.toggle {
+  display: inherit;
+  z-index: 4;
+  position: absolute;
+  right: 0;
+}
