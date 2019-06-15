@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ViewChild, ElementRef } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {ViewChild, ElementRef} from '@angular/core';
 import {DataService} from '../../services/data.service';
+
 declare var require: any;
 const Highcharts = require('highcharts/highstock');
 
@@ -17,7 +18,7 @@ require('highcharts-indicators/js/atr')(Highcharts);
 })
 export class CandleStickComponent implements OnInit {
   public list_indicators = ['SMA', 'EMA', 'ATR', 'RSI'];
-  public select = "indicator";
+  public select = 'indicator';
   stockClass = 'TQBR';
   secClass = 'SBER';
   dateBegin = new Date(2015, 6, 29, 10);
@@ -30,9 +31,10 @@ export class CandleStickComponent implements OnInit {
 
   pause = false;
 
-  constructor(private rest: DataService) { }
+  constructor(private rest: DataService) {
+  }
 
-  @ViewChild("container", { read: ElementRef }) container: ElementRef;
+  @ViewChild('container', {read: ElementRef}) container: ElementRef;
   chart: any;
   sma_data = {
     id: this.secClass,
@@ -43,8 +45,7 @@ export class CandleStickComponent implements OnInit {
     tooltip: {
       pointFormat: '<span style="color: {point.color}; ">pointFormat SMA: </span> {point.y}<br>'
     },
-    styles: {
-    }
+    styles: {}
   };
   ema_data = {
     id: this.secClass,
@@ -85,9 +86,9 @@ export class CandleStickComponent implements OnInit {
       dashstyle: 'solid',
     },
     yAxis: {
-      lineWidth:2,
+      lineWidth: 2,
       title: {
-        text:'My RSI title'
+        text: 'My RSI title'
       },
     }
   };
@@ -103,6 +104,7 @@ export class CandleStickComponent implements OnInit {
     this.chart.series[4].hide();
     this.chart.series[5].hide();
   }
+
   updateDataChart(secClass: string, dateBegin: Date, dateEnd: Date, stockClass?: string, approximation?: string) {
     this.rest.getData(secClass, dateBegin, dateEnd, stockClass, approximation)
       .subscribe(dataChart => {
@@ -111,7 +113,7 @@ export class CandleStickComponent implements OnInit {
           const lastDate = dataChart[dataChart.length - 1].date;
           for (i = 0; i < this.chart.series.length; i += 1) {
             let lastIdx = this.chart.series[i].xData.length - 1;
-            if ( lastIdx >= 0 && this.chart.series[i].xData[lastIdx] === dataChart[0].date) {
+            if (lastIdx >= 0 && this.chart.series[i].xData[lastIdx] === dataChart[0].date) {
               this.chart.series[i].removePoint(lastIdx, false);
             }
           }
@@ -179,8 +181,8 @@ export class CandleStickComponent implements OnInit {
         alignAxes: false,
         shadow: true,
         events: {
-          load: function() {
-            setInterval(function() {
+          load: function () {
+            setInterval(function () {
               if (that.pause) {
                 return;
               }
@@ -354,24 +356,24 @@ export class CandleStickComponent implements OnInit {
   select_indicator(indicator) {
     this.pause = true;
     this.chart.redraw();
-    if (indicator == "SMA") {
-      if (this.select != "indicator") {
+    if (indicator == 'SMA') {
+      if (this.select != 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
 
       this.chart.addIndicator(this.sma_data);
     }
-    else if (indicator == "EMA") {
-      if (this.select != "indicator") {
+    else if (indicator == 'EMA') {
+      if (this.select != 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
 
       this.chart.addIndicator(this.ema_data);
     }
-    else if (indicator == "ATR") {
-      if (this.select != "indicator") {
+    else if (indicator == 'ATR') {
+      if (this.select != 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
@@ -379,7 +381,7 @@ export class CandleStickComponent implements OnInit {
       this.chart.addIndicator(this.atr_data);
     }
     else {
-      if (this.select != "indicator") {
+      if (this.select != 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
