@@ -7,9 +7,30 @@
   top: 24px;
 }
 
-.toggle {
-  display: inherit;
-  z-index: 4;
-  position: absolute;
-  right: 0;
+.candle_type{
+  .mat-button-toggle {
+    border: 2px solid #f28628;
+    border-radius: 8px;
+    width: 50px;
+    font-size: 12px;
+    font-style: initial;
+    font-weight: bold;
+    margin: 2px;
+    ::ng-deep .mat-button-toggle-label-content {
+      line-height: 20px;
+      padding: 0;
+    }
+  }
 }
+
+.mat-button-toggle-disabled{
+  border: 1px solid #c5c0c7;
+  background-color: #e1dde5;
+}
+
+.mat-button-toggle-checked {
+  border: 1px solid #c5c0c7;
+  background-color: #e1dde5;
+}
+
+

@@ -6,14 +6,25 @@ import { Subject } from 'rxjs';
 })
 export class ProgressService {
   isProgress = new Subject<boolean>();
+  activeProgress = false;
 
   constructor() { }
 
   public show() {
-    this.isProgress.next(true);
+    if (this.activeProgress) {
+      this.isProgress.next(true);
+    }
   }
 
   public hide() {
+    this.activeProgress = false;
     this.isProgress.next(false);
+  }
+
+  public activation() {
+    this.activeProgress = true;
+  }
+  public isActive() {
+    return this.activeProgress;
   }
 }

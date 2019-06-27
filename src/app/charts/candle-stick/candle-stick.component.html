@@ -1,4 +1,21 @@
 <div class="chart_div" #container></div>
+<div class="candle_type">
+  <mat-button-toggle-group #group="matButtonToggleGroup"
+                           [value]="selectedCandleType"
+                           (change)="onCandleTypeChange(group.value)">
+    <mat-button-toggle value="ALL">
+      ALL
+    </mat-button-toggle>
+    <mat-button-toggle value="BID">
+      BID
+    </mat-button-toggle>
+    <mat-button-toggle value="OFFER">
+      OFFER
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+
+
 <div class="drop_main">
     <div>
         <div class="col-1 margin-right-24 pad-left-0 d-inline-block">

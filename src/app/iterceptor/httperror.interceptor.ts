@@ -17,14 +17,14 @@ import { ProgressService } from '../services/progress.service';
 export class HttpErrorInterceptor implements HttpInterceptor {
     constructor(public errorDialogService: ErrorDialogService, private progress: ProgressService) { }
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-//        this.progress.show();
+        this.progress.show();
         this.addHeaders(request);
         return next.handle(request)
             .pipe(
                 map((event: HttpEvent<any>) => {
                     return event;
                 }),
-//                finalize(() => this.progress.hide()),
+                finalize(() => this.progress.hide()),
                 catchError((error: HttpErrorResponse) => {
                     console.error(error);
                     this.errorDialogService.openDialog({

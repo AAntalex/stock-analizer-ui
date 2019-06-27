@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ViewChild, ElementRef} from '@angular/core';
 import {DataService} from '../../services/data.service';
+import {ProgressService} from '../../services/progress.service';
 
 declare var require: any;
 const Highcharts = require('highcharts/highstock');
@@ -19,19 +20,20 @@ require('highcharts-indicators/js/atr')(Highcharts);
 export class CandleStickComponent implements OnInit {
   public list_indicators = ['SMA', 'EMA', 'ATR', 'RSI'];
   public select = 'indicator';
+  public selectedCandleType = 'ALL';
+  public repeatLoad = true;
+
   stockClass = 'TQBR';
   secClass = 'SBER';
-  dateBegin = new Date(2015, 6, 29, 10);
-  dateEnd = new Date(2015, 6, 29, 11);
+//  dateBegin = new Date(2015, 6, 29, 10);
+//  dateEnd = new Date(2015, 6, 29, 11);
+  dateBegin = new Date(2019, 5, 20, 10);
+//  dateEnd = new Date(2019, 5, 14, 12);
+//  dateEnd = new Date(Date.now());
+  dateEnd = null;
   approximation = '2';
 
-
-  dataChart = new Map();
-
-
-  pause = false;
-
-  constructor(private rest: DataService) {
+  constructor(private rest: DataService, private progress: ProgressService) {
   }
 
   @ViewChild('container', {read: ElementRef}) container: ElementRef;
@@ -99,13 +101,13 @@ export class CandleStickComponent implements OnInit {
         timezoneOffset: -3 * 60
       },
     });
+    this.progress.activation();
     this.setChart();
     this.updateDataChart(this.secClass, this.dateBegin, this.dateEnd, this.stockClass, this.approximation);
-    this.chart.series[4].hide();
-    this.chart.series[5].hide();
+    this.onCandleTypeChange(this.selectedCandleType);
   }
 
-  updateDataChart(secClass: string, dateBegin: Date, dateEnd: Date, stockClass?: string, approximation?: string) {
+  updateDataChart(secClass: string, dateBegin: Date, dateEnd?: Date, stockClass?: string, approximation?: string) {
     this.rest.getData(secClass, dateBegin, dateEnd, stockClass, approximation)
       .subscribe(dataChart => {
         let i;
@@ -135,21 +137,27 @@ export class CandleStickComponent implements OnInit {
             if (dataChart[i].dataBid) {
               this.chart.series[2].addPoint([
                 dataChart[i].date,
+                dataChart[i].dataBid.candle.open,
+                dataChart[i].dataBid.candle.high,
+                dataChart[i].dataBid.candle.low,
                 dataChart[i].dataBid.candle.close
               ], false);
-              this.chart.series[4].addPoint([
+              this.chart.series[3].addPoint([
                 dataChart[i].date,
                 dataChart[i].dataBid.volume
               ], false);
             }
             if (dataChart[i].dataOffer) {
-              this.chart.series[3].addPoint([
+              this.chart.series[4].addPoint([
                 dataChart[i].date,
+                dataChart[i].dataOffer.candle.open,
+                dataChart[i].dataOffer.candle.high,
+                dataChart[i].dataOffer.candle.low,
                 dataChart[i].dataOffer.candle.close
               ], false);
               this.chart.series[5].addPoint([
                 dataChart[i].date,
-                -dataChart[i].dataOffer.volume
+                dataChart[i].dataOffer.volume
               ], false);
             }
             let j;
@@ -183,13 +191,15 @@ export class CandleStickComponent implements OnInit {
         events: {
           load: function () {
             setInterval(function () {
-              if (that.pause) {
+              if (that.progress.isActive() || !that.repeatLoad) {
                 return;
               }
               if (that.dateEnd < that.dateBegin) {
                 that.dateEnd = new Date(that.dateBegin.getTime() + 1000);
               } else {
-                that.dateEnd = new Date(that.dateEnd.getTime() + 1000);
+                if (that.dateEnd) {
+                  that.dateEnd = new Date(that.dateEnd.getTime() + 1000);
+                }
               }
               that.updateDataChart(that.secClass, that.dateBegin, that.dateEnd, that.stockClass, that.approximation);
             }, 1000);
@@ -327,53 +337,80 @@ export class CandleStickComponent implements OnInit {
           data: [],
           yAxis: 1
         }, {
+          type: 'candlestick',
           id: this.secClass + '-BID',
           name: this.secClass + ' BID',
           data: [],
-          color: 'green'
-        }, {
-          id: this.secClass + '-OFFER',
-          name: this.secClass + ' OFFER',
-          data: [],
-          color: 'red'
         }, {
           type: 'column',
           id: this.secClass + '-BID-volume',
           name: this.secClass + ' BID Volume',
           data: [],
+          color: '#80ff84',
           yAxis: 1
+        }, {
+          type: 'candlestick',
+          id: this.secClass + '-OFFER',
+          name: this.secClass + ' OFFER',
+          data: [],
         }, {
           type: 'column',
           id: this.secClass + '-OFFER-volume',
           name: this.secClass + ' OFFER Volume',
           data: [],
+          color: '#ff3b2f',
           yAxis: 1
         }]
     });
   }
 
+  onCandleTypeChange(candleType) {
+    this.selectedCandleType = candleType;
+    this.chart.series[0].hide();
+    this.chart.series[1].hide();
+    this.chart.series[2].hide();
+    this.chart.series[3].hide();
+    this.chart.series[4].hide();
+    this.chart.series[5].hide();
+
+    if (candleType === 'ALL') {
+      this.chart.series[0].show();
+      this.chart.series[1].show();
+    }
+    if (candleType === 'BID') {
+      this.chart.series[2].show();
+      this.chart.series[3].show();
+    }
+    if (candleType === 'OFFER') {
+      this.chart.series[4].show();
+      this.chart.series[5].show();
+    }
+  }
+
   //Indicators Logic
   select_indicator(indicator) {
-    this.pause = true;
+    this.repeatLoad = false;
+
+
     this.chart.redraw();
-    if (indicator == 'SMA') {
-      if (this.select != 'indicator') {
+    if (indicator === 'SMA') {
+      if (this.select !== 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
 
       this.chart.addIndicator(this.sma_data);
     }
-    else if (indicator == 'EMA') {
-      if (this.select != 'indicator') {
+    else if (indicator === 'EMA') {
+      if (this.select !== 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
 
       this.chart.addIndicator(this.ema_data);
     }
-    else if (indicator == 'ATR') {
-      if (this.select != 'indicator') {
+    else if (indicator === 'ATR') {
+      if (this.select !== 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
@@ -381,7 +418,7 @@ export class CandleStickComponent implements OnInit {
       this.chart.addIndicator(this.atr_data);
     }
     else {
-      if (this.select != 'indicator') {
+      if (this.select !== 'indicator') {
         this.chart.indicators.allItems[0].destroy();
       }
       this.select = indicator;
