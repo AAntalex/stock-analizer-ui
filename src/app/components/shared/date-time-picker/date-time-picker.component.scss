@@ -1,0 +1,20 @@
+::ng-deep .my-date-time-picker{
+  padding: 10px;
+  position: relative;
+  width: 135px;
+  div.wc-date-container{
+    border: 1px solid #6dd1ff;
+    border-radius: 5px;
+    background: none;
+    height: 25px;
+    box-shadow: 0 0 0 1px #13b3ff, 0 0 0 2px #13b3ff
+    , inset 0px 0px 10px #13b3ff, 0px 0px 20px #20b7ff, 0px 0px 15px #6dd1ff;
+
+    font-style: italic;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 3px;
+    opacity: .8;
+
+  }
+}

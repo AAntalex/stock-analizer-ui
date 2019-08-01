@@ -4,33 +4,23 @@
   height: 100%;
   position: absolute;
   width: 100%;
-  top: 24px;
 }
 
-.candle_type{
-  .mat-button-toggle {
-    border: 2px solid #f28628;
-    border-radius: 8px;
-    width: 50px;
-    font-size: 12px;
-    font-style: initial;
-    font-weight: bold;
-    margin: 2px;
-    ::ng-deep .mat-button-toggle-label-content {
-      line-height: 20px;
-      padding: 0;
-    }
+.header_div{
+  width: 30%;
+  display: inline-flex;
+}
+
+.select_indicator_div{
+  width: 2%;
+}
+
+::ng-deep .select_indicators_div{
+  width: 2%;
+
+  .mat-button-toggle-group {
+    max-height: 360px;
+    overflow: auto;
   }
 }
-
-.mat-button-toggle-disabled{
-  border: 1px solid #c5c0c7;
-  background-color: #e1dde5;
-}
-
-.mat-button-toggle-checked {
-  border: 1px solid #c5c0c7;
-  background-color: #e1dde5;
-}
-
 

@@ -1,0 +1,44 @@
+::ng-deep .my-autocomplete-group{
+  position: relative;
+
+  .mat-input-element {
+    font: inherit;
+    color: #63cdff;
+    padding: 0;
+    height: 20px;
+    text-align: center;
+    margin: 3px;
+    border-radius: 5px;
+    caret-color : #fff;
+  }
+
+  .mat-form-field-flex{
+    width: 180px;
+    color: white;
+  }
+
+  .mat-form-field-infix{
+    padding: 0;
+  }
+}
+
+::ng-deep .mat-autocomplete-panel {
+  opacity: .8;
+  border: 1px solid red;
+  background: black;
+
+  .mat-option-text{
+    color: white;
+    font-size: 10px;
+    font-style: italic;
+  }
+
+  .mat-optgroup-label{
+    font-weight: bold;
+    color: red;
+  }
+}
+
+::ng-deep .cdk-overlay-pane {
+  min-width: 200px;
+}

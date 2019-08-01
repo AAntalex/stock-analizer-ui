@@ -3,6 +3,8 @@ import {RestService} from './rest.service';
 import {from, of} from 'rxjs';
 import {catchError, map, mergeMap, toArray} from 'rxjs/internal/operators';
 import {HttpParams} from '@angular/common/http';
+import {finalize} from 'rxjs/operators';
+import {ProgressService} from './progress.service';
 declare var require: any;
 const moment = require('moment/moment')
 
@@ -11,7 +13,12 @@ const moment = require('moment/moment')
 })
 export class DataService {
   dateFormat = 'YYYYMMDDHHmmss';
-  constructor(private rest: RestService) { }
+  constructor(private rest: RestService, private progress: ProgressService) { }
+
+  public init() {
+    return this.rest.getRestEndpoint('stockanalizer/init');
+  }
+
   public getData(secClass: string, dateBegin: Date, dateEnd?: Date, stockClass?: string, approximation?: string) {
     let params = new HttpParams()
       .set("secClass", secClass)
@@ -20,7 +27,19 @@ export class DataService {
       .set("stockClass", stockClass)
       .set("approximation", approximation)
     ;
+    this.progress.show();
     return this.rest.getRestEndpoint('stockanalizer/charts', params)
+      .pipe(
+        catchError(err => of([])),
+        finalize(() => this.progress.hide()),
+        mergeMap(resp => from(resp)),
+        map(a => { return a as any; }),
+        toArray()
+      );
+  }
+
+  public getClasses() {
+    return this.rest.getRestEndpoint('stockanalizer/classes')
       .pipe(
         catchError(err => of([])),
         mergeMap(resp => from(resp)),
@@ -28,4 +47,5 @@ export class DataService {
         toArray()
       );
   }
+
 }

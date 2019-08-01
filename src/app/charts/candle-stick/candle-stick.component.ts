@@ -18,20 +18,26 @@ require('highcharts-indicators/js/atr')(Highcharts);
   styleUrls: ['./candle-stick.component.scss']
 })
 export class CandleStickComponent implements OnInit {
-  public list_indicators = ['SMA', 'EMA', 'ATR', 'RSI'];
-  public select = 'indicator';
+  public listIndicators = [];
+  public listIndicators2 = ['SMA', 'EMA', 'ATR', 'RSI'];
+  public listTypeCharts = ['ALL', 'BID', 'OFFER'];
+  public repeatLoadIcon = ['autorenew'];
+  public classList = [];
   public selectedCandleType = 'ALL';
-  public repeatLoad = true;
+  public selectedIndicators = [];
+  public repeatLoad = false;
 
+  indicators = new Map();;
   stockClass = 'TQBR';
   secClass = 'SBER';
-//  dateBegin = new Date(2015, 6, 29, 10);
-//  dateEnd = new Date(2015, 6, 29, 11);
-  dateBegin = new Date(2019, 5, 20, 10);
-//  dateEnd = new Date(2019, 5, 14, 12);
-//  dateEnd = new Date(Date.now());
+  selectedSecClass = 'Сбербанк (SBER)';
+  startDate = null;
+  dateBegin = new Date();
   dateEnd = null;
   approximation = '2';
+  indicatorOffset = 0;
+  maxPrice = null;
+  minPrice = null;
 
   constructor(private rest: DataService, private progress: ProgressService) {
   }
@@ -84,7 +90,7 @@ export class CandleStickComponent implements OnInit {
     },
     styles: {
       strokeWidth: 2,
-      stroke: 'black',
+      stroke: '#fff',
       dashstyle: 'solid',
     },
     yAxis: {
@@ -100,11 +106,29 @@ export class CandleStickComponent implements OnInit {
       global: {
         timezoneOffset: -3 * 60
       },
+      lang: {
+        rangeSelectorZoom: ''
+      },
     });
-    this.progress.activation();
+
+    this.dateBegin.setHours(10, 0, 0, 0);
+    this.startDate = this.dateBegin;
+    this.initData();
+  }
+
+  initData() {
+    this.listIndicators.length = 0;
     this.setChart();
-    this.updateDataChart(this.secClass, this.dateBegin, this.dateEnd, this.stockClass, this.approximation);
     this.onCandleTypeChange(this.selectedCandleType);
+    this.rest.getClasses()
+      .subscribe(classes => {
+        this.classList = classes;
+      });
+    this.rest.init()
+      .subscribe(() => {
+        this.progress.activation();
+        this.updateDataChart(this.secClass, this.dateBegin, this.dateEnd, this.stockClass, this.approximation);
+      });
   }
 
   updateDataChart(secClass: string, dateBegin: Date, dateEnd?: Date, stockClass?: string, approximation?: string) {
@@ -123,6 +147,8 @@ export class CandleStickComponent implements OnInit {
             this.dateBegin = new Date(lastDate);
           }
           for (i = 0; i < dataChart.length; i += 1) {
+            this.maxPrice = dataChart[i].maxPrice;
+            this.minPrice = dataChart[i].minPrice;
             this.chart.series[0].addPoint([
               dataChart[i].date,
               dataChart[i].data.candle.open,
@@ -162,30 +188,53 @@ export class CandleStickComponent implements OnInit {
             }
             let j;
             for (j = 0; j < dataChart[i].indicators.length; j += 1) {
-              if (this.chart.series.length < 8 + j) {
+              if (!this.indicatorOffset) {
+                this.indicatorOffset = this.chart.series.length;
+              }
+              let indicatorIndex = this.indicatorOffset + j - 1;
+              if (this.chart.series.length < this.indicatorOffset + 1 + j) {
+                const indicatorName = dataChart[i].indicators[j].code;
+                this.listIndicators.push(indicatorName);
+                this.indicators.set(indicatorName, indicatorIndex);
                 this.chart.addSeries({
-                  id: dataChart[i].indicators[j].code,
-                  name: dataChart[i].indicators[j].code,
+                  id: indicatorName,
+                  name: indicatorName,
                   data: [],
                   type: 'line',
-                  yAxis: 2
+                  yAxis: 2,
+                  color: '#f28628',
                 }, false);
               }
-              this.chart.series[6 + j].addPoint([
+              this.chart.series[indicatorIndex].addPoint([
                 dataChart[i].date,
                 dataChart[i].indicators[j].value
               ], false);
             }
           }
         }
+        this.chart.yAxis[0].options.plotLines[0].value = this.maxPrice;
+        this.chart.yAxis[0].options.plotLines[0].label.text = this.maxPrice;
+        this.chart.yAxis[0].options.plotLines[1].value = this.minPrice;
+        this.chart.yAxis[0].options.plotLines[1].label.text = this.minPrice;
+        this.chart.yAxis[0].update();
+
         this.chart.series[0].update(this.chart.series[0].yData, true);
+        this.onSelectIndicators(this.selectedIndicators);
       });
   }
 
   setChart() {
-    var that = this;
+    const that = this;
     this.chart = new Highcharts.stockChart(this.container.nativeElement, {
       chart: {
+        backgroundColor: {
+          linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+          stops: [
+            [0, '#00008B'],
+            [1, '#000']
+          ],
+        },
+        marginLeft: 60,
         alignAxes: false,
         shadow: true,
         events: {
@@ -209,12 +258,14 @@ export class CandleStickComponent implements OnInit {
       plotOptions: {
         candlestick: {
           color: '#ff0000',
-          upColor: '#00ff00'
-        }
+          upColor: '#00ff00',
+          lineColor: '#63cdff'
+        },
       },
+
       rangeSelector: {
-        x: -100,
-        y: -10,
+        x: -150,
+        y: 0,
         buttons: [
           {
             type: 'minute',
@@ -247,34 +298,47 @@ export class CandleStickComponent implements OnInit {
             text: 'All',
           }
         ],
+
+
         buttonTheme: {
-          fill: 'none',
-          stroke: 'none',
-          'stroke-width': 0,
-          r: 8,
-          style: {
-            color: '#3F51B5',
-            fontWeight: 'bold',
-            fontFamily: 'DINRoundProRegular',
-            fontSize: '12px',
-            lineHeight: '24px'
+          r: 5,
+          width: 40,
+          fill: {
+            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+            stops: [
+              [0, '#000'],
+              [1, '#707073'],
+            ],
           },
+          style: {
+            fontWeight: 'bold',
+            fontStyle: 'initial',
+            fontSize: '12px',
+            color: '#CCC',
+          },
+
           states: {
-            hover: {},
-            active: {
-              backgrondColor: 'rgb(90, 106, 192, 0.5)',
+            hover: {
+              fill: '#707073',
+              style: {
+                color: '#FFF'
+              }
             },
             select: {
-              fill: 'rgb(90, 106, 192, 0.5)',
+              fill: {
+                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                stops: [
+                  [0, '#000'],
+                  [1, '#00f'],
+                ]
+              },
               style: {
-                color: '#3F51B5',
-                padding: '5px'
+                color: '#13b3ff'
               }
             }
           }
         },
         selected: 1,
-        inputEnabled: true,
         verticalAlign: 'top',
         buttonPosition: {
           align: 'right'
@@ -284,31 +348,84 @@ export class CandleStickComponent implements OnInit {
           verticalAlign: 'top',
           x: 100
         },
+        inputEnabled: false,
         allButtonsEnabled: false,
       },
-      yAxis: [{
-        offset: 50,
-        labels: {
-          align: 'left'
+
+
+
+
+
+      yAxis: [
+        {
+          labels: {
+            align: 'left',
+            style: {
+              color: '#fff'
+            }
+          },
+          height: '80%',
+          resize: {
+            enabled: true
+          },
+          plotLines: [{
+            value: null,
+            color: '#00FF00',
+            width: 2,
+            label: {
+              style: {
+                color: '#fff'
+              },
+              text: 'Max price for period'
+            }
+          }, {
+            value: null,
+            color: '#ff0000',
+            width: 2,
+            label: {
+              style: {
+                color: '#fff'
+              },
+              text: 'Min price for period'
+            }
+          }],
         },
-        height: '80%',
-        resize: {
-          enabled: true
-        }
-      }, {
-        offset: 50,
-        labels: {
-          align: 'left'
+        {
+          labels: {
+            style: {
+              color: '#fff'
+            }
+          },
+          top: '80%',
+          height: '20%',
         },
-        top: '80%',
-        height: '20%',
-      }, {
-        top: '80%',
-        height: '20%',
-        opposite: false
-      }],
+        {
+          top: '80%',
+          height: '20%',
+          opposite: false,
+          max: 100,
+          min: 0,
+          labels: {
+            style: {
+              color: '#fff'
+            }
+          },
+        }],
       xAxis: {
-        overscroll: 50,
+        gridLineColor: '#707073',
+        labels: {
+          style: {
+            color: '#fff'
+          }
+        },
+        lineColor: '#707073',
+        minorGridLineColor: '#505053',
+        tickColor: '#707073',
+        title: {
+          style: {
+            color: '#A0A0A3'
+          }
+        }
       },
       navigator: {
         enabled: true
@@ -317,12 +434,13 @@ export class CandleStickComponent implements OnInit {
         enabled: true
       },
 
-      title: {
-        text: this.secClass
-      },
       tooltip: {
-        valueDecimals: 2,
+        valueDecimals: 4,
         enabledIndicators: true,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        style: {
+          color: '#F0F0F0'
+        }
       },
       series: [
         {
@@ -346,7 +464,7 @@ export class CandleStickComponent implements OnInit {
           id: this.secClass + '-BID-volume',
           name: this.secClass + ' BID Volume',
           data: [],
-          color: '#80ff84',
+          color: '#00ff00',
           yAxis: 1
         }, {
           type: 'candlestick',
@@ -358,20 +476,43 @@ export class CandleStickComponent implements OnInit {
           id: this.secClass + '-OFFER-volume',
           name: this.secClass + ' OFFER Volume',
           data: [],
-          color: '#ff3b2f',
+          color: '#ff0000',
           yAxis: 1
         }]
     });
   }
 
+  onClassChange(event) {
+    const secClass = event.value.substring(event.value.indexOf('(') + 1, event.value.indexOf(')'));
+    if (this.stockClass !== event.group || this.secClass !== secClass) {
+      this.stockClass = event.group;
+      this.secClass = secClass;
+      this.dateBegin = this.startDate;
+      this.initData();
+    }
+  }
+
+  onDateEndSelect(date) {
+    if (this.dateEnd !== date) {
+      this.dateEnd = date;
+      this.dateBegin = this.startDate;
+      this.initData();
+    }
+  }
+
+  onDateBeginSelect(date) {
+    this.startDate = date;
+    if (this.dateBegin !== date) {
+      this.dateBegin = date;
+      this.initData();
+    }
+  }
+
   onCandleTypeChange(candleType) {
-    this.selectedCandleType = candleType;
-    this.chart.series[0].hide();
-    this.chart.series[1].hide();
-    this.chart.series[2].hide();
-    this.chart.series[3].hide();
-    this.chart.series[4].hide();
-    this.chart.series[5].hide();
+    let i;
+    for (i = 0; i < 6; i += 1) {
+      this.chart.series[i].hide();
+    }
 
     if (candleType === 'ALL') {
       this.chart.series[0].show();
@@ -387,44 +528,40 @@ export class CandleStickComponent implements OnInit {
     }
   }
 
-  //Indicators Logic
-  select_indicator(indicator) {
-    this.repeatLoad = false;
+  onClickRepeatLoad() {
+    this.repeatLoad = !this.repeatLoad;
+  }
 
-
-    this.chart.redraw();
-    if (indicator === 'SMA') {
-      if (this.select !== 'indicator') {
-        this.chart.indicators.allItems[0].destroy();
-      }
-      this.select = indicator;
-
-      this.chart.addIndicator(this.sma_data);
+  onSelectIndicators(indicators) {
+    this.selectedIndicators = indicators;
+    if (!this.indicatorOffset) {
+      return;
     }
-    else if (indicator === 'EMA') {
-      if (this.select !== 'indicator') {
-        this.chart.indicators.allItems[0].destroy();
-      }
-      this.select = indicator;
-
-      this.chart.addIndicator(this.ema_data);
+    let i;
+    for (i = this.indicatorOffset; i < this.chart.series.length; i += 1) {
+      this.chart.series[i - 1].hide();
     }
-    else if (indicator === 'ATR') {
-      if (this.select !== 'indicator') {
-        this.chart.indicators.allItems[0].destroy();
+    for (i = 0; i < indicators.length; i += 1) {
+      const indicatorName = indicators[i];
+      if (this.indicators.has(indicatorName)) {
+        this.chart.series[this.indicators.get(indicatorName)].show();
       }
-      this.select = indicator;
-
-      this.chart.addIndicator(this.atr_data);
-    }
-    else {
-      if (this.select !== 'indicator') {
-        this.chart.indicators.allItems[0].destroy();
-      }
-      this.select = indicator;
-
-      this.chart.addIndicator(this.rsi_data);
     }
   }
 
+  onSelectIndicator(indicator) {
+    this.chart.redraw();
+    if (this.chart.indicators.allItems.length > 0) {
+      this.chart.indicators.allItems[0].destroy();
+    }
+    if (indicator === 'SMA') {
+      this.chart.addIndicator(this.sma_data);
+    } else if (indicator === 'EMA') {
+      this.chart.addIndicator(this.ema_data);
+    } else if (indicator === 'ATR') {
+      this.chart.addIndicator(this.atr_data);
+    } else if (indicator === 'RSI') {
+      this.chart.addIndicator(this.rsi_data);
+    }
+  }
 }

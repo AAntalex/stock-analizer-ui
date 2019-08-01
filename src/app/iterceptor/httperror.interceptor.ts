@@ -3,28 +3,25 @@ import { ErrorDialogService } from '../error-dialog/error-dialog.service';
 import {
     HttpInterceptor,
     HttpRequest,
-    HttpResponse,
     HttpHandler,
     HttpEvent,
     HttpErrorResponse
 } from '@angular/common/http';
 
 import { Observable, throwError } from 'rxjs';
-import { map, catchError, finalize } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { ProgressService } from '../services/progress.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
     constructor(public errorDialogService: ErrorDialogService, private progress: ProgressService) { }
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        this.progress.show();
         this.addHeaders(request);
         return next.handle(request)
             .pipe(
                 map((event: HttpEvent<any>) => {
                     return event;
                 }),
-                finalize(() => this.progress.hide()),
                 catchError((error: HttpErrorResponse) => {
                     console.error(error);
                     this.errorDialogService.openDialog({
