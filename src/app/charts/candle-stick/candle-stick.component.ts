@@ -27,7 +27,8 @@ export class CandleStickComponent implements OnInit {
   public selectedIndicators = [];
   public repeatLoad = false;
 
-  indicators = new Map();;
+  indicatorLabels = new Map();
+  indicators = new Map();
   stockClass = 'TQBR';
   secClass = 'SBER';
   selectedSecClass = 'Сбербанк (SBER)';
@@ -38,6 +39,8 @@ export class CandleStickComponent implements OnInit {
   indicatorOffset = 0;
   maxPrice = null;
   minPrice = null;
+  maxPercent = null;
+  minPercent = null;
 
   constructor(private rest: DataService, private progress: ProgressService) {
   }
@@ -149,6 +152,8 @@ export class CandleStickComponent implements OnInit {
           for (i = 0; i < dataChart.length; i += 1) {
             this.maxPrice = dataChart[i].maxPrice;
             this.minPrice = dataChart[i].minPrice;
+            this.maxPercent = dataChart[i].maxPercent;
+            this.minPercent = dataChart[i].minPercent;
             this.chart.series[0].addPoint([
               dataChart[i].date,
               dataChart[i].data.candle.open,
@@ -195,13 +200,17 @@ export class CandleStickComponent implements OnInit {
               if (this.chart.series.length < this.indicatorOffset + 1 + j) {
                 const indicatorName = dataChart[i].indicators[j].code;
                 this.listIndicators.push(indicatorName);
+                this.indicatorLabels.set(indicatorName, {
+                  label: dataChart[i].indicators[j].name,
+                  suffix: dataChart[i].indicators[j].period > 0 ? dataChart[i].indicators[j].period : ''
+                });
                 this.indicators.set(indicatorName, indicatorIndex);
                 this.chart.addSeries({
                   id: indicatorName,
                   name: indicatorName,
                   data: [],
                   type: 'line',
-                  yAxis: 2,
+                  yAxis: dataChart[i].indicators[j].type === 'TREND' ? 1 : 2,
                   color: '#f28628',
                 }, false);
               }
@@ -213,9 +222,9 @@ export class CandleStickComponent implements OnInit {
           }
         }
         this.chart.yAxis[0].options.plotLines[0].value = this.maxPrice;
-        this.chart.yAxis[0].options.plotLines[0].label.text = this.maxPrice;
+        this.chart.yAxis[0].options.plotLines[0].label.text = this.maxPrice + ' ( +' + this.maxPercent + '% )';
         this.chart.yAxis[0].options.plotLines[1].value = this.minPrice;
-        this.chart.yAxis[0].options.plotLines[1].label.text = this.minPrice;
+        this.chart.yAxis[0].options.plotLines[1].label.text = this.minPrice + ' ( ' + this.minPercent + '% )';
         this.chart.yAxis[0].update();
 
         this.chart.series[0].update(this.chart.series[0].yData, true);

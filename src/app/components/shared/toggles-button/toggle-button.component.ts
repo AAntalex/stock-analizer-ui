@@ -8,6 +8,7 @@ import {Component, Input, Output, EventEmitter} from '@angular/core';
 export class ToggleButtonComponent {
   @Input() values = [];
   @Input() icons = [];
+  @Input() labels = new Map();
   @Input() value;
   @Input() vertical = false;
   @Input() multiple = false;
@@ -24,6 +25,20 @@ export class ToggleButtonComponent {
       this.change.emit(group.value);
     }
     this.value = group.value;
+  }
+
+  getLabel(value: string) {
+    if (this.labels.has(value)) {
+      return this.labels.get(value).label;
+    }
+    return value;
+  }
+
+  getSuffix(value: string) {
+    if (this.labels.has(value)) {
+      return this.labels.get(value).suffix;
+    }
+    return null;
   }
 
   constructor() { }

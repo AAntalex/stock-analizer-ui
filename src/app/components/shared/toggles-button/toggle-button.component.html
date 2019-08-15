@@ -7,7 +7,12 @@
                            (change)="onChange(group.value)"
                            (click) = "onClick(group)">
     <mat-button-toggle *ngFor="let value of values" value={{value}}>
-      {{value}}
+      <div class="label_div">
+        <label>{{getLabel(value)}}</label>
+        <label class="suffix_label" *ngIf="getSuffix(value)">
+          {{getSuffix(value)}}
+        </label>
+      </div>
     </mat-button-toggle>
     <mat-button-toggle *ngFor="let value of icons" value={{value}}>
       <mat-icon>{{value}}</mat-icon>
