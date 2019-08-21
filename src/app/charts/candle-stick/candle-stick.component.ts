@@ -121,6 +121,7 @@ export class CandleStickComponent implements OnInit {
 
   initData() {
     this.listIndicators.length = 0;
+    this.indicators.clear();
     this.setChart();
     this.onCandleTypeChange(this.selectedCandleType);
     this.rest.getClasses()
@@ -193,27 +194,27 @@ export class CandleStickComponent implements OnInit {
             }
             let j;
             for (j = 0; j < dataChart[i].indicators.length; j += 1) {
+              const indicatorName = dataChart[i].indicators[j].code;
               if (!this.indicatorOffset) {
                 this.indicatorOffset = this.chart.series.length;
               }
-              let indicatorIndex = this.indicatorOffset + j - 1;
-              if (this.chart.series.length < this.indicatorOffset + 1 + j) {
-                const indicatorName = dataChart[i].indicators[j].code;
+              if (!this.indicators.has(indicatorName)) {
                 this.listIndicators.push(indicatorName);
                 this.indicatorLabels.set(indicatorName, {
                   label: dataChart[i].indicators[j].name,
                   suffix: dataChart[i].indicators[j].period > 0 ? dataChart[i].indicators[j].period : ''
                 });
-                this.indicators.set(indicatorName, indicatorIndex);
+                this.indicators.set(indicatorName, this.indicatorOffset + this.indicators.size - 1);
                 this.chart.addSeries({
                   id: indicatorName,
                   name: indicatorName,
                   data: [],
                   type: 'line',
-                  yAxis: dataChart[i].indicators[j].type === 'TREND' ? 1 : 2,
-                  color: '#f28628',
+                  yAxis: dataChart[i].indicators[j].type === 'TREND' ? 0 : 2,
+//                  color: '#f28628',
                 }, false);
               }
+              const indicatorIndex = this.indicators.get(indicatorName);
               this.chart.series[indicatorIndex].addPoint([
                 dataChart[i].date,
                 dataChart[i].indicators[j].value
@@ -226,7 +227,6 @@ export class CandleStickComponent implements OnInit {
         this.chart.yAxis[0].options.plotLines[1].value = this.minPrice;
         this.chart.yAxis[0].options.plotLines[1].label.text = this.minPrice + ' ( ' + this.minPercent + '% )';
         this.chart.yAxis[0].update();
-
         this.chart.series[0].update(this.chart.series[0].yData, true);
         this.onSelectIndicators(this.selectedIndicators);
       });
@@ -400,13 +400,13 @@ export class CandleStickComponent implements OnInit {
           }],
         },
         {
+          top: '80%',
+          height: '20%',
           labels: {
             style: {
               color: '#fff'
             }
           },
-          top: '80%',
-          height: '20%',
         },
         {
           top: '80%',
@@ -419,7 +419,8 @@ export class CandleStickComponent implements OnInit {
               color: '#fff'
             }
           },
-        }],
+        },
+      ],
       xAxis: {
         gridLineColor: '#707073',
         labels: {
