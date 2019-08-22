@@ -205,12 +205,27 @@ export class CandleStickComponent implements OnInit {
                   suffix: dataChart[i].indicators[j].period > 0 ? dataChart[i].indicators[j].period : ''
                 });
                 this.indicators.set(indicatorName, this.indicatorOffset + this.indicators.size - 1);
+
+                let yAxis = -1;
+                let type = 'line';
+                switch(dataChart[i].indicators[j].type) {
+                  case 'TREND':
+                    yAxis = 0;
+                    break;
+                  case 'OSCILLATOR':
+                    yAxis = 2;
+                    break;
+                  case 'BAR':
+                    yAxis = 3;
+                    type = 'column';
+                    break;
+                }
                 this.chart.addSeries({
                   id: indicatorName,
                   name: indicatorName,
                   data: [],
-                  type: 'line',
-                  yAxis: dataChart[i].indicators[j].type === 'TREND' ? 0 : 2,
+                  type: type,
+                  yAxis: yAxis,
 //                  color: '#f28628',
                 }, false);
               }
@@ -377,27 +392,28 @@ export class CandleStickComponent implements OnInit {
           resize: {
             enabled: true
           },
-          plotLines: [{
-            value: null,
-            color: '#00FF00',
-            width: 2,
-            label: {
-              style: {
-                color: '#fff'
-              },
-              text: 'Max price for period'
-            }
-          }, {
-            value: null,
-            color: '#ff0000',
-            width: 2,
-            label: {
-              style: {
-                color: '#fff'
-              },
-              text: 'Min price for period'
-            }
-          }],
+          plotLines: [
+            {
+              value: null,
+              color: '#00FF00',
+              width: 2,
+              label: {
+                style: {
+                  color: '#fff'
+                },
+                text: 'Max price for period'
+              }},
+            {
+              value: null,
+              color: '#ff0000',
+              width: 2,
+              label: {
+                style: {
+                  color: '#fff'
+                },
+                text: 'Min price for period'
+              }
+            }],
         },
         {
           top: '80%',
@@ -418,6 +434,14 @@ export class CandleStickComponent implements OnInit {
             style: {
               color: '#fff'
             }
+          },
+        },
+        {
+          top: '80%',
+          height: '20%',
+          opposite: false,
+          labels: {
+            enabled: false
           },
         },
       ],
