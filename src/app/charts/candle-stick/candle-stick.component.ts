@@ -27,6 +27,9 @@ export class CandleStickComponent implements OnInit {
   public selectedIndicators = [];
   public repeatLoad = false;
 
+  TREND_AXIS = 0;
+  OSCILLATOR_AXIS = 2;
+  BAR_AXIS = 3;
   indicatorLabels = new Map();
   indicators = new Map();
   stockClass = 'TQBR';
@@ -210,14 +213,14 @@ export class CandleStickComponent implements OnInit {
                 let type = 'line';
                 switch (dataChart[i].indicators[j].type) {
                   case 'TREND':
-                    yAxis = 0;
+                    yAxis = this.TREND_AXIS;
                     break;
                   case 'OSCILLATOR':
-                    yAxis = 2;
+                    yAxis = this.OSCILLATOR_AXIS;
                     break;
                   case 'BAR':
-                    yAxis = 3;
-                    type = 'column';
+                    yAxis = this.BAR_AXIS;
+                    type = 'areaspline';
                     break;
                 }
                 this.chart.addSeries({
@@ -242,8 +245,8 @@ export class CandleStickComponent implements OnInit {
         this.chart.yAxis[0].options.plotLines[1].value = this.minPrice;
         this.chart.yAxis[0].options.plotLines[1].label.text = this.minPrice + ' ( ' + this.minPercent + '% )';
         this.chart.yAxis[0].update();
-        this.chart.series[0].update(this.chart.series[0].yData, true);
         this.onSelectIndicators(this.selectedIndicators);
+        this.chart.series[0].update(this.chart.series[0].yData, true);
       });
   }
 
@@ -286,7 +289,6 @@ export class CandleStickComponent implements OnInit {
           lineColor: '#63cdff'
         },
       },
-
       rangeSelector: {
         x: -150,
         y: 0,
@@ -322,8 +324,6 @@ export class CandleStickComponent implements OnInit {
             text: 'All',
           }
         ],
-
-
         buttonTheme: {
           r: 5,
           width: 40,
@@ -375,8 +375,6 @@ export class CandleStickComponent implements OnInit {
         inputEnabled: false,
         allButtonsEnabled: false,
       },
-
-
       yAxis: [
         {
           labels: {
@@ -429,10 +427,19 @@ export class CandleStickComponent implements OnInit {
           max: 100,
           min: 0,
           labels: {
-            style: {
-              color: '#fff'
-            }
+            enabled: false,
           },
+          plotLines: [
+            {
+              value: null,
+              color: '#f28628',
+              width: 1,
+            },
+            {
+              value: null,
+              color: '#f28628',
+              width: 1,
+            }],
         },
         {
           top: '80%',
@@ -572,13 +579,20 @@ export class CandleStickComponent implements OnInit {
     let i;
     for (i = this.indicatorOffset; i < this.chart.series.length; i += 1) {
       this.chart.series[i - 1].hide();
+      this.chart.yAxis[this.OSCILLATOR_AXIS].options.plotLines[0].value = null;
+      this.chart.yAxis[this.OSCILLATOR_AXIS].options.plotLines[1].value = null;
     }
     for (i = 0; i < indicators.length; i += 1) {
       const indicatorName = indicators[i];
       if (this.indicators.has(indicatorName)) {
         this.chart.series[this.indicators.get(indicatorName)].show();
+        if (this.indicatorLabels.get(indicatorName).label === 'RSI') {
+          this.chart.yAxis[this.OSCILLATOR_AXIS].options.plotLines[0].value = 30;
+          this.chart.yAxis[this.OSCILLATOR_AXIS].options.plotLines[1].value = 70;
+        }
       }
     }
+    this.chart.yAxis[this.OSCILLATOR_AXIS].update();
   }
 
   onSelectIndicator(indicator) {
