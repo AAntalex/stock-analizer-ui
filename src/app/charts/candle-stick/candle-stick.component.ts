@@ -208,7 +208,7 @@ export class CandleStickComponent implements OnInit {
 
                 let yAxis = -1;
                 let type = 'line';
-                switch(dataChart[i].indicators[j].type) {
+                switch (dataChart[i].indicators[j].type) {
                   case 'TREND':
                     yAxis = 0;
                     break;
@@ -252,7 +252,7 @@ export class CandleStickComponent implements OnInit {
     this.chart = new Highcharts.stockChart(this.container.nativeElement, {
       chart: {
         backgroundColor: {
-          linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+          linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
           stops: [
             [0, '#00008B'],
             [1, '#000']
@@ -328,7 +328,7 @@ export class CandleStickComponent implements OnInit {
           r: 5,
           width: 40,
           fill: {
-            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+            linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
             stops: [
               [0, '#000'],
               [1, '#707073'],
@@ -350,7 +350,7 @@ export class CandleStickComponent implements OnInit {
             },
             select: {
               fill: {
-                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
                 stops: [
                   [0, '#000'],
                   [1, '#00f'],
@@ -377,9 +377,6 @@ export class CandleStickComponent implements OnInit {
       },
 
 
-
-
-
       yAxis: [
         {
           labels: {
@@ -402,7 +399,8 @@ export class CandleStickComponent implements OnInit {
                   color: '#fff'
                 },
                 text: 'Max price for period'
-              }},
+              }
+            },
             {
               value: null,
               color: '#ff0000',
