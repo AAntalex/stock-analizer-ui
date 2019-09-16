@@ -7,8 +7,9 @@ import { ProgressService } from './services/progress.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  title = 'Биржевой технический анализатор';
+
   constructor(private progress: ProgressService) {
     this.progress.show();
   }
-  title = 'Биржевой технический анализатор';
 }

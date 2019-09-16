@@ -1,0 +1,29 @@
+<div class="main_div">
+  <div class="inner_div">
+    <form [formGroup]="loginForm">
+      <div class="full_width">
+        <mat-form-field class="full_width">
+          <input matInput placeholder="Логин" formControlName="username">
+          <mat-error *ngIf="submitted && f.username.errors && f.username.errors.required">Имя пользователя не может быть
+            пустым
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="full_width">
+        <mat-form-field class="full_width">
+          <input matInput type="password" placeholder="Пароль" formControlName="password">
+          <mat-error *ngIf="submitted && f.password.errors && f.password.errors.required">Пароль не может быть пустым
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div mat-dialog-actions class="full_width">
+        <div class="button_aligner">
+          <button mat-raised-button color="primary" [disabled]="loading" (click)='onSubmit()'>
+            Войти
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<mat-spinner *ngIf="loading" color="primary" diameter="100" strokeWidth="4" class="spinner"></mat-spinner>

@@ -16,7 +16,7 @@ export class DataService {
   constructor(private rest: RestService, private progress: ProgressService) { }
 
   public init() {
-    return this.rest.getRestEndpoint('stockanalizer/init');
+    return this.rest.getRestEndpoint('stock/init');
   }
 
   public getData(secClass: string, dateBegin: Date, dateEnd?: Date, stockClass?: string, approximation?: string) {
@@ -28,7 +28,7 @@ export class DataService {
       .set("approximation", approximation)
     ;
     this.progress.show();
-    return this.rest.getRestEndpoint('stockanalizer/charts', params)
+    return this.rest.getRestEndpoint('stock/charts', params)
       .pipe(
         catchError(err => of([])),
         finalize(() => this.progress.hide()),
@@ -39,7 +39,7 @@ export class DataService {
   }
 
   public getClasses() {
-    return this.rest.getRestEndpoint('stockanalizer/classes')
+    return this.rest.getRestEndpoint('stock/classes')
       .pipe(
         catchError(err => of([])),
         mergeMap(resp => from(resp)),

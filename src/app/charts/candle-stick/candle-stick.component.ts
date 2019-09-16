@@ -7,9 +7,7 @@ declare var require: any;
 const Highcharts = require('highcharts/highstock');
 
 require('highcharts-indicators/js/indicators')(Highcharts);
-require('highcharts-indicators/js/sma')(Highcharts);
 require('highcharts-indicators/js/ema')(Highcharts);
-require('highcharts-indicators/js/rsi')(Highcharts);
 require('highcharts-indicators/js/atr')(Highcharts);
 
 @Component({
@@ -19,7 +17,7 @@ require('highcharts-indicators/js/atr')(Highcharts);
 })
 export class CandleStickComponent implements OnInit {
   public listIndicators = [];
-  public listIndicators2 = ['SMA', 'EMA', 'ATR', 'RSI'];
+  public listIndicators2 = ['SMA', 'ATR'];
   public listTypeCharts = ['ALL', 'BID', 'OFFER'];
   public repeatLoadIcon = ['autorenew'];
   public classList = [];
@@ -61,19 +59,6 @@ export class CandleStickComponent implements OnInit {
     },
     styles: {}
   };
-  ema_data = {
-    id: this.secClass,
-    type: 'ema',
-    params: {
-      period: 5,
-      index: 0
-    },
-    styles: {
-      strokeWidth: 2,
-      stroke: 'green',
-      dashstyle: 'solid',
-    }
-  };
   atr_data = {
     id: this.secClass,
     type: 'atr',
@@ -84,26 +69,6 @@ export class CandleStickComponent implements OnInit {
       strokeWidth: 2,
       stroke: 'orange',
       dashstyle: 'solid',
-    }
-  };
-  rsi_data = {
-    id: this.secClass,
-    type: 'rsi',
-    params: {
-      period: 14,
-      overbought: 70,
-      oversold: 30
-    },
-    styles: {
-      strokeWidth: 2,
-      stroke: '#fff',
-      dashstyle: 'solid',
-    },
-    yAxis: {
-      lineWidth: 2,
-      title: {
-        text: 'My RSI title'
-      },
     }
   };
 
@@ -261,8 +226,8 @@ export class CandleStickComponent implements OnInit {
             [1, '#000']
           ],
         },
-        marginLeft: 60,
-        alignAxes: false,
+        marginLeft: 80,
+        alignAxes: true,
         shadow: true,
         events: {
           load: function () {
@@ -602,12 +567,8 @@ export class CandleStickComponent implements OnInit {
     }
     if (indicator === 'SMA') {
       this.chart.addIndicator(this.sma_data);
-    } else if (indicator === 'EMA') {
-      this.chart.addIndicator(this.ema_data);
     } else if (indicator === 'ATR') {
       this.chart.addIndicator(this.atr_data);
-    } else if (indicator === 'RSI') {
-      this.chart.addIndicator(this.rsi_data);
     }
   }
 }

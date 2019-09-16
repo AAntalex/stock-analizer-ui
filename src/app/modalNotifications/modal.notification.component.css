@@ -1,0 +1,10 @@
+@import '~@angular/cdk/overlay-prebuilt.css';
+
+.message {
+  margin: 20px;
+  text-align: center;
+}
+
+.full_width {
+  width: 100%;
+}
