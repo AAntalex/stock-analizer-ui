@@ -16,6 +16,12 @@ require('highcharts-indicators/js/atr')(Highcharts);
   styleUrls: ['./candle-stick.component.scss']
 })
 export class CandleStickComponent implements OnInit {
+  private dataClass;
+  private stockClass;
+  private secClass;
+  private selectedSecClass;
+  private startDate: Date = new Date();
+
   public listIndicators = [];
   public listIndicators2 = ['SMA', 'ATR'];
   public listTypeCharts = ['ALL', 'BID', 'OFFER'];
@@ -25,16 +31,12 @@ export class CandleStickComponent implements OnInit {
   public selectedIndicators = [];
   public repeatLoad = false;
 
+  dateBegin: Date = new Date();
   TREND_AXIS = 0;
   OSCILLATOR_AXIS = 2;
   BAR_AXIS = 3;
   indicatorLabels = new Map();
   indicators = new Map();
-  stockClass = 'TQBR';
-  secClass = 'SBER';
-  selectedSecClass = 'Сбербанк (SBER)';
-  startDate = null;
-  dateBegin = new Date();
   dateEnd = null;
   approximation = '2';
   indicatorOffset = 0;
@@ -44,6 +46,17 @@ export class CandleStickComponent implements OnInit {
   minPercent = null;
 
   constructor(private rest: DataService, private progress: ProgressService) {
+    this.dataClass = JSON.parse(localStorage.getItem('dataClass'));
+
+    this.stockClass = this.dataClass ? this.dataClass.stockClass : 'TQBR';
+    this.secClass = this.dataClass ? this.dataClass.secClass : 'SBER';
+    this.selectedSecClass = this.dataClass ? this.dataClass.selectedSecClass : 'Сбербанк (SBER)';
+
+    if (localStorage.getItem('startDate')) {
+      this.startDate = new Date(localStorage.getItem('startDate'));
+    } else {
+      this.startDate.setHours(10, 0, 0, 0);
+    }
   }
 
   @ViewChild('container', {read: ElementRef}) container: ElementRef;
@@ -82,8 +95,12 @@ export class CandleStickComponent implements OnInit {
       },
     });
 
-    this.dateBegin.setHours(10, 0, 0, 0);
-    this.startDate = this.dateBegin;
+    console.log('AAA this.startDate ' + this.startDate);
+
+    this.dateBegin = this.startDate;
+
+    console.log('AAA this.dateBegin ' + this.dateBegin.getTime());
+
     this.initData();
   }
 
@@ -492,6 +509,12 @@ export class CandleStickComponent implements OnInit {
       this.stockClass = event.group;
       this.secClass = secClass;
       this.dateBegin = this.startDate;
+
+      localStorage.setItem('dataClass', JSON.stringify({
+        stockClass: this.stockClass,
+        selectedSecClass: event.value,
+        secClass,
+      }));
       this.initData();
     }
   }
@@ -506,6 +529,7 @@ export class CandleStickComponent implements OnInit {
 
   onDateBeginSelect(date) {
     this.startDate = date;
+    localStorage.setItem('startDate', date);
     if (this.dateBegin !== date) {
       this.dateBegin = date;
       this.initData();
