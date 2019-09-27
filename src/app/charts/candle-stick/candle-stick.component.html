@@ -15,7 +15,8 @@
   <app-autocomplete
     [stateGroups]="classList"
     [value]="selectedSecClass"
-    (onChange)="onClassChange($event)"></app-autocomplete>
+    (onChange)="onClassChange($event)">
+  </app-autocomplete>
 </div>
 
 <div class="select_indicator_div">
@@ -37,3 +38,7 @@
     (change)="onSelectIndicators($event)">
   </app-toggle-button>
 </div>
+
+<app-cdk-drag-drop>
+  <app-quotes-chart></app-quotes-chart>
+</app-cdk-drag-drop>

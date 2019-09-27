@@ -7,9 +7,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ProgressComponent } from './components/shared/progress/progress.component';
-import { ToggleButtonComponent } from './components/shared/toggles-button/toggle-button.component';
-import { DateTimePickerComponent } from './components/shared/date-time-picker/date-time-picker.component';
 import { ProgressService } from './services/progress.service';
 import { MaterialModule } from './material.module';
 import { HttpErrorInterceptor } from './helpers/httperror.interceptor';
@@ -19,11 +16,17 @@ import { CandleStickComponent } from './charts/candle-stick/candle-stick.compone
 import { QuotesChartComponent } from './charts/quotes-chart/quotes-chart.component';
 import { AutocompleteComponent } from './components/shared/autocomplete/autocomplete.component';
 import { AppSidenavComponent } from './components/shared/app-sidenav/sidenav.component';
-import { ModalNotificationService } from "./modalNotifications/modal.notification.service";
-import { ModalNotificationComponent } from "./modalNotifications/modal.notification.component";
+import { ModalNotificationService } from './modalNotifications/modal.notification.service';
+import { ModalNotificationComponent } from './modalNotifications/modal.notification.component';
+import { CdkDragDropComponent } from './components/shared/cdk-drag-drop/cdk-drag-drop.component';
+import { ProgressComponent } from './components/shared/progress/progress.component';
+import { ToggleButtonComponent } from './components/shared/toggles-button/toggle-button.component';
+import { DateTimePickerComponent } from './components/shared/date-time-picker/date-time-picker.component';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { DatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -37,6 +40,7 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
     QuotesChartComponent,
     LoginComponent,
     ModalNotificationComponent,
+    CdkDragDropComponent,
   ],
   imports: [
     BrowserModule,
@@ -49,6 +53,7 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
     TimepickerModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
+    DragDropModule,
   ],
   providers: [
     ProgressService,
@@ -58,8 +63,12 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
   ],
   entryComponents: [
-    ModalNotificationComponent,
+    ModalNotificationComponent
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [
+    AppComponent
+  ]
 })
 export class AppModule { }
+
+platformBrowserDynamic().bootstrapModule(AppModule);

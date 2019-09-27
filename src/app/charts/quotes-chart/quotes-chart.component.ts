@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {DataService} from '../../services/data.service';
 import {ProgressService} from '../../services/progress.service';
 
@@ -11,71 +11,104 @@ const Highcharts = require('highcharts/highstock');
   styleUrls: ['./quotes-chart.component.scss']
 })
 export class QuotesChartComponent implements OnInit {
+  private quotes;
+  private maxValue = 0;
 
-  constructor(private rest: DataService, private progress: ProgressService) {
+  constructor(private dataService: DataService, private progress: ProgressService) {
   }
 
   @ViewChild('container', {read: ElementRef}) container: ElementRef;
   chart: any;
 
-  ngOnInit() {
-    Highcharts.setOptions({
-      global: {
-        timezoneOffset: -3 * 60
-      },
-    });
-    this.initData();
+  private setQuotes(quotes: any) {
+    let i;
+    const openBid = [];
+    const closeBid = [];
+    const openOffer = [];
+    const closeOffer = [];
+
+    for (i = 0; i < quotes.length; i += 1) {
+      this.maxValue = Math.max(
+        this.maxValue,
+        quotes[i].bid.openVolume,
+        quotes[i].offer.openVolume,
+        quotes[i].bid.closeVolume,
+        quotes[i].offer.closeVolume,
+      );
+
+      openBid.push([quotes[i].price + '', -quotes[i].bid.openVolume]);
+      openOffer.push([quotes[i].price + '', quotes[i].offer.openVolume]);
+      closeBid.push([quotes[i].price + '', -quotes[i].bid.closeVolume]);
+      closeOffer.push([quotes[i].price + '', quotes[i].offer.closeVolume]);
+    }
+    return {
+      bid: {open: openBid, close: closeBid}
+    , offer: {open: openOffer, close: closeOffer}};
   }
 
-  initData() {
-    this.setChart();
+  ngOnInit() {
+    this.dataService.currentQuotes.subscribe(quotes => {
+      if (quotes) {
+        this.maxValue = 0;
+        this.quotes = this.setQuotes(quotes);
+        this.setChart();
+      }
+    });
   }
 
   setChart() {
     this.chart = new Highcharts.stockChart(this.container.nativeElement, {
       chart: {
-        backgroundColor: {
-          linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
-          stops: [
-            [0, '#00008B'],
-            [1, '#000']
-          ],
-        },
+        type: 'areaspline',
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        inverted: true,
+        margin: 0,
       },
       yAxis: [{
         labels: {
-          align: 'left',
-          style: {
-            color: '#fff'
-          }
+          enabled: false,
         },
-        height: '100%',
-        resize: {
-          enabled: true
-        },
+        max: this.maxValue,
+        min: -this.maxValue,
       }],
       xAxis: {
-        gridLineColor: '#707073',
         labels: {
-          style: {
-            color: '#fff'
-          }
+          enabled: false,
         },
-        lineColor: '#707073',
-        minorGridLineColor: '#505053',
-        tickColor: '#707073',
-        title: {
-          style: {
-            color: '#A0A0A3'
-          }
-        }
       },
       series: [{
-        type: 'column',
-        id: 'quotes',
-        name: 'quotes',
-        data: [],
-      }]
+        name: 'open',
+        data: this.quotes.offer.open,
+        pointPadding: 0,
+        color: '#aaffaa',
+      },{
+        name: 'close',
+        data: this.quotes.offer.close,
+        pointPadding: 0,
+        color: '#00ff00',
+      },{
+        name: 'open',
+        data: this.quotes.bid.open,
+        pointPadding: 0,
+        color: '#ffaaaa',
+      },{
+        name: 'close',
+        data: this.quotes.bid.close,
+        pointPadding: 0,
+        color: '#ff0000',
+      }],
+      rangeSelector: {
+        enabled: false,
+      },
+      navigator: {
+        enabled: false,
+      },
+      scrollbar: {
+        enabled: false,
+      },
+      credits: {
+        enabled: false,
+      },
     });
   }
 }

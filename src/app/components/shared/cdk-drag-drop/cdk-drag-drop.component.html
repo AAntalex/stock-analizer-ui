@@ -1,0 +1,12 @@
+<div class="my-cdk-drag-drop" [ngStyle]="{'height.px': height}" cdkDrag>
+  <mat-toolbar class="drop-menu">
+    <span class="fill-remaining-space"></span>
+    <button mat-icon-button (click)="onMinimize()" fxShow="true" fxHide.gt-sm>
+      <mat-icon>minimize</mat-icon>
+    </button>
+    <button mat-icon-button (click)="onMaximize()" fxShow="true" fxHide.gt-sm>
+      <mat-icon inline="true">maximize</mat-icon>
+    </button>
+  </mat-toolbar>
+  <ng-content></ng-content>
+</div>

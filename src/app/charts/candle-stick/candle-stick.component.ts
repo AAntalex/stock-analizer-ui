@@ -44,8 +44,10 @@ export class CandleStickComponent implements OnInit {
   minPrice = null;
   maxPercent = null;
   minPercent = null;
+  quotes = new Map();
+  curQoutesIdx;
 
-  constructor(private rest: DataService, private progress: ProgressService) {
+  constructor(private dataService: DataService, private progress: ProgressService) {
     this.dataClass = JSON.parse(localStorage.getItem('dataClass'));
 
     this.stockClass = this.dataClass ? this.dataClass.stockClass : 'TQBR';
@@ -94,26 +96,21 @@ export class CandleStickComponent implements OnInit {
         rangeSelectorZoom: ''
       },
     });
-
-    console.log('AAA this.startDate ' + this.startDate);
-
     this.dateBegin = this.startDate;
-
-    console.log('AAA this.dateBegin ' + this.dateBegin.getTime());
-
     this.initData();
   }
 
   initData() {
     this.listIndicators.length = 0;
     this.indicators.clear();
+    this.quotes.clear();
     this.setChart();
     this.onCandleTypeChange(this.selectedCandleType);
-    this.rest.getClasses()
+    this.dataService.getClasses()
       .subscribe(classes => {
         this.classList = classes;
       });
-    this.rest.init()
+    this.dataService.init()
       .subscribe(() => {
         this.progress.activation();
         this.updateDataChart(this.secClass, this.dateBegin, this.dateEnd, this.stockClass, this.approximation);
@@ -121,7 +118,7 @@ export class CandleStickComponent implements OnInit {
   }
 
   updateDataChart(secClass: string, dateBegin: Date, dateEnd?: Date, stockClass?: string, approximation?: string) {
-    this.rest.getData(secClass, dateBegin, dateEnd, stockClass, approximation)
+    this.dataService.getData(secClass, dateBegin, dateEnd, stockClass, approximation)
       .subscribe(dataChart => {
         let i;
         if (dataChart.length > 0) {
@@ -220,7 +217,10 @@ export class CandleStickComponent implements OnInit {
                 dataChart[i].indicators[j].value
               ], false);
             }
+            this.quotes.set(dataChart[i].date, dataChart[i].quotes);
           }
+          this.curQoutesIdx = dataChart[dataChart.length - 1].date;
+          this.dataService.setQoutes(this.quotes.get(this.curQoutesIdx));
         }
         this.chart.yAxis[0].options.plotLines[0].value = this.maxPrice;
         this.chart.yAxis[0].options.plotLines[0].label.text = this.maxPrice + ' ( +' + this.maxPercent + '% )';
@@ -452,9 +452,11 @@ export class CandleStickComponent implements OnInit {
         enabled: true
       },
       scrollbar: {
-        enabled: true
+        enabled: false
       },
-
+      credits: {
+        enabled: false
+      },
       tooltip: {
         valueDecimals: 4,
         enabledIndicators: true,
@@ -463,8 +465,21 @@ export class CandleStickComponent implements OnInit {
           color: '#F0F0F0'
         }
       },
-      series: [
-        {
+      series:
+        [{
+          point: {
+            events: {
+              mouseOver: function() {
+                that.dataService.setQoutes(that.quotes.get(this.x));
+              },
+              mouseOut: function() {
+                that.dataService.setQoutes(that.quotes.get(that.curQoutesIdx));
+              },
+              click: function() {
+                that.curQoutesIdx = this.x;
+              },
+            }
+          },
           name: this.secClass,
           type: 'candlestick',
           id: this.secClass,

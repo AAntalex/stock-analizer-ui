@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core';
 import {RestService} from './rest.service';
-import {from, of} from 'rxjs';
+import {from, of, Subject} from 'rxjs';
 import {catchError, map, mergeMap, toArray} from 'rxjs/internal/operators';
 import {HttpParams} from '@angular/common/http';
 import {finalize} from 'rxjs/operators';
 import {ProgressService} from './progress.service';
 declare var require: any;
-const moment = require('moment/moment')
+const moment = require('moment/moment');
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
   dateFormat = 'YYYYMMDDHHmmss';
+  quotes = new Subject<any>();
+
+  currentQuotes = this.quotes.asObservable();
+
   constructor(private rest: RestService, private progress: ProgressService) { }
 
   public init() {
@@ -48,4 +52,7 @@ export class DataService {
       );
   }
 
+  public setQoutes(quotes: any) {
+    this.quotes.next(quotes);
+  }
 }

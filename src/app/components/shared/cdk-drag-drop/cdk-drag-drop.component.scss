@@ -1,0 +1,29 @@
+.my-cdk-drag-drop {
+  position: absolute;
+  width: 300px;
+  border: solid 2px #ff0000;
+  border-radius: 5px;
+  background: linear-gradient(0deg, #000, #00008B);
+  cursor: move;
+  opacity: .6;
+  z-index: 1;
+}
+
+.my-cdk-drag-drop:active {
+  box-shadow: 0 0 0 1px #13b3ff, 0 0 0 2px #13b3ff
+  , inset 0px 0px 10px #13b3ff, 0px 0px 20px #20b7ff, 0px 0px 15px #6dd1ff;
+}
+
+.fill-remaining-space {
+  flex: 1 1 auto;
+}
+
+.drop-menu {
+  height: 20px;
+  padding: 0;
+  margin: 0;
+
+  .mat-icon-button {
+    transform: scale(0.9);
+  }
+}
