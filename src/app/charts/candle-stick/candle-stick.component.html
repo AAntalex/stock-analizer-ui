@@ -17,6 +17,7 @@
     [value]="selectedSecClass"
     (onChange)="onClassChange($event)">
   </app-autocomplete>
+  <app-cdk-drag-drop></app-cdk-drag-drop>
 </div>
 
 <div class="select_indicator_div">
@@ -38,7 +39,3 @@
     (change)="onSelectIndicators($event)">
   </app-toggle-button>
 </div>
-
-<app-cdk-drag-drop>
-  <app-quotes-chart></app-quotes-chart>
-</app-cdk-drag-drop>

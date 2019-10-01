@@ -13,9 +13,6 @@ const moment = require('moment/moment');
 })
 export class DataService {
   dateFormat = 'YYYYMMDDHHmmss';
-  quotes = new Subject<any>();
-
-  currentQuotes = this.quotes.asObservable();
 
   constructor(private rest: RestService, private progress: ProgressService) { }
 
@@ -50,9 +47,5 @@ export class DataService {
         map(a => { return a as any; }),
         toArray()
       );
-  }
-
-  public setQoutes(quotes: any) {
-    this.quotes.next(quotes);
   }
 }

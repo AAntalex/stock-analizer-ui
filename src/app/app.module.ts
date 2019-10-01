@@ -27,6 +27,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { DatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { TableQuotesComponent } from './components/shared/table-quotes/table-quotes.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     LoginComponent,
     ModalNotificationComponent,
     CdkDragDropComponent,
+    TableQuotesComponent,
   ],
   imports: [
     BrowserModule,

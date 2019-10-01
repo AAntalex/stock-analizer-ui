@@ -1,5 +1,11 @@
 <div class="my-cdk-drag-drop" [ngStyle]="{'height.px': height}" cdkDrag>
   <mat-toolbar class="drop-menu">
+    <button mat-icon-button (click)="onChart()" fxShow="true" fxHide.gt-sm>
+      <mat-icon>show_chart</mat-icon>
+    </button>
+    <button mat-icon-button (click)="onTable()" fxShow="true" fxHide.gt-sm>
+      <mat-icon>table_chart</mat-icon>
+    </button>
     <span class="fill-remaining-space"></span>
     <button mat-icon-button (click)="onMinimize()" fxShow="true" fxHide.gt-sm>
       <mat-icon>minimize</mat-icon>
@@ -8,5 +14,6 @@
       <mat-icon inline="true">maximize</mat-icon>
     </button>
   </mat-toolbar>
-  <ng-content></ng-content>
+  <app-quotes-chart *ngIf="showChart"></app-quotes-chart>
+  <app-table-quotes *ngIf="showTable" [height]="height"></app-table-quotes>
 </div>

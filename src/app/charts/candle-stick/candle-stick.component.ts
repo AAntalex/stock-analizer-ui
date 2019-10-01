@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ViewChild, ElementRef} from '@angular/core';
 import {DataService} from '../../services/data.service';
+
 import {ProgressService} from '../../services/progress.service';
+import {QuotesService} from '../../services/quotes.service';
 
 declare var require: any;
 const Highcharts = require('highcharts/highstock');
@@ -47,7 +49,9 @@ export class CandleStickComponent implements OnInit {
   quotes = new Map();
   curQoutesIdx;
 
-  constructor(private dataService: DataService, private progress: ProgressService) {
+  constructor(private dataService: DataService,
+              private progress: ProgressService,
+              private quotesService: QuotesService) {
     this.dataClass = JSON.parse(localStorage.getItem('dataClass'));
 
     this.stockClass = this.dataClass ? this.dataClass.stockClass : 'TQBR';
@@ -220,7 +224,7 @@ export class CandleStickComponent implements OnInit {
             this.quotes.set(dataChart[i].date, dataChart[i].quotes);
           }
           this.curQoutesIdx = dataChart[dataChart.length - 1].date;
-          this.dataService.setQoutes(this.quotes.get(this.curQoutesIdx));
+          this.quotesService.setQuotes(this.quotes.get(this.curQoutesIdx));
         }
         this.chart.yAxis[0].options.plotLines[0].value = this.maxPrice;
         this.chart.yAxis[0].options.plotLines[0].label.text = this.maxPrice + ' ( +' + this.maxPercent + '% )';
@@ -470,10 +474,10 @@ export class CandleStickComponent implements OnInit {
           point: {
             events: {
               mouseOver: function() {
-                that.dataService.setQoutes(that.quotes.get(this.x));
+                that.quotesService.setQuotes(that.quotes.get(this.x));
               },
               mouseOut: function() {
-                that.dataService.setQoutes(that.quotes.get(that.curQoutesIdx));
+                that.quotesService.setQuotes(that.quotes.get(that.curQoutesIdx));
               },
               click: function() {
                 that.curQoutesIdx = this.x;

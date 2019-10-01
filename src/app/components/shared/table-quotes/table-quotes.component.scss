@@ -1,0 +1,22 @@
+.table-container {
+  position: relative;
+  width: 100%;
+  overflow: auto;
+}
+
+.mat-table {
+  width: 100%;
+  background: linear-gradient(90deg, #000, #00008B);
+}
+
+.mat-row {
+  height: 20px;
+}
+
+.mat-column{
+  text-align: center;
+}
+
+.mat-cell{
+  color: white;
+}

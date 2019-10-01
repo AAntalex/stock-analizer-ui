@@ -1,0 +1,20 @@
+<div class="table-container" [ngStyle]="{'height.px': height}">
+  <table mat-table [dataSource]="dataSource" class="my-table">
+    <ng-container matColumnDef="bid-open">
+      <td mat-cell *matCellDef="let element"> {{element.bid.candle.open > 0 ? element.bid.candle.open : ""}} </td>
+    </ng-container>
+    <ng-container matColumnDef="bid-close">
+      <td mat-cell *matCellDef="let element"> {{element.bid.candle.close > 0 ? element.bid.candle.close : ""}} </td>
+    </ng-container>
+    <ng-container matColumnDef="price">
+      <td mat-cell *matCellDef="let element"> {{element.price}} </td>
+    </ng-container>
+    <ng-container matColumnDef="offer-open">
+      <td mat-cell *matCellDef="let element"> {{element.offer.candle.open > 0 ? element.offer.candle.open : ""}} </td>
+    </ng-container>
+    <ng-container matColumnDef="offer-close">
+      <td mat-cell *matCellDef="let element"> {{element.offer.candle.close > 0 ? element.offer.candle.close : ""}} </td>
+    </ng-container>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

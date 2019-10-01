@@ -1,6 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {DataService} from '../../services/data.service';
-import {ProgressService} from '../../services/progress.service';
+import {QuotesService} from '../../services/quotes.service';
 
 declare var require: any;
 const Highcharts = require('highcharts/highstock');
@@ -11,10 +10,12 @@ const Highcharts = require('highcharts/highstock');
   styleUrls: ['./quotes-chart.component.scss']
 })
 export class QuotesChartComponent implements OnInit {
+  @Input() isActive = false;
+
   private quotes;
   private maxValue = 0;
 
-  constructor(private dataService: DataService, private progress: ProgressService) {
+  constructor(private quotesService: QuotesService) {
   }
 
   @ViewChild('container', {read: ElementRef}) container: ElementRef;
@@ -47,8 +48,8 @@ export class QuotesChartComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dataService.currentQuotes.subscribe(quotes => {
-      if (quotes) {
+     this.quotesService.currentQuotes.subscribe(quotes => {
+      if (this.quotesService.isActive && quotes) {
         this.maxValue = 0;
         this.quotes = this.setQuotes(quotes);
         this.setChart();
