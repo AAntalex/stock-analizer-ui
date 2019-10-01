@@ -9,7 +9,7 @@ import {QuotesService} from '../../../services/quotes.service';
 export class TableQuotesComponent implements OnInit {
   @Input() height = 300;
   dataSource = [];
-  displayedColumns: string[] = ['bid-open', 'bid-close', 'price', 'offer-close', 'offer-open'];
+  displayedColumns: string[] = ['bid-open', 'bid-close', 'price', 'offer-open', 'offer-close'];
 
   constructor(private quotesService: QuotesService) { }
 
