@@ -180,17 +180,21 @@ export class CandleStickComponent implements OnInit {
             }
             let j;
             for (j = 0; j < dataChart[i].indicators.length; j += 1) {
-              const indicatorName = dataChart[i].indicators[j].code;
+              const indicatorCode = dataChart[i].indicators[j].code;
               if (!this.indicatorOffset) {
                 this.indicatorOffset = this.chart.series.length;
               }
-              if (!this.indicators.has(indicatorName)) {
-                this.listIndicators.push(indicatorName);
-                this.indicatorLabels.set(indicatorName, {
-                  label: dataChart[i].indicators[j].name,
-                  suffix: dataChart[i].indicators[j].period > 0 ? dataChart[i].indicators[j].period : ''
-                });
-                this.indicators.set(indicatorName, this.indicatorOffset + this.indicators.size - 1);
+              if (!this.indicators.has(indicatorCode)) {
+                const suffix = dataChart[i].indicators[j].period > 0 ? dataChart[i].indicators[j].period : '';
+                const indicatorName = dataChart[i].indicators[j].name + suffix;
+                if (!this.indicatorLabels.has(indicatorName)) {
+                  this.listIndicators.push(indicatorName);
+                  this.indicatorLabels.set(indicatorName, {
+                    label: dataChart[i].indicators[j].name,
+                    suffix: suffix
+                  });
+                }
+                this.indicators.set(indicatorCode, this.indicatorOffset + this.indicators.size - 1);
 
                 let yAxis = -1;
                 let type = 'line';
@@ -207,15 +211,15 @@ export class CandleStickComponent implements OnInit {
                     break;
                 }
                 this.chart.addSeries({
-                  id: indicatorName,
-                  name: indicatorName,
+                  id: indicatorCode,
+                  name: indicatorCode,
                   data: [],
                   type: type,
                   yAxis: yAxis,
-//                  color: '#f28628',
+                  color: dataChart[i].indicators[j].type === 'TREND' ? '#fff' : null,
                 }, false);
               }
-              const indicatorIndex = this.indicators.get(indicatorName);
+              const indicatorIndex = this.indicators.get(indicatorCode);
               this.chart.series[indicatorIndex].addPoint([
                 dataChart[i].date,
                 dataChart[i].indicators[j].value
@@ -231,6 +235,7 @@ export class CandleStickComponent implements OnInit {
         this.chart.yAxis[0].options.plotLines[1].value = this.minPrice;
         this.chart.yAxis[0].options.plotLines[1].label.text = this.minPrice + ' ( ' + this.minPercent + '% )';
         this.chart.yAxis[0].update();
+
         this.onSelectIndicators(this.selectedIndicators);
         this.chart.series[0].update(this.chart.series[0].yData, true);
       });
@@ -490,7 +495,7 @@ export class CandleStickComponent implements OnInit {
           data: [],
         }, {
           type: 'column',
-          id: this.secClass + '-volume',
+          id: this.secClass + 'trend',
           name: this.secClass + ' Volume',
           data: [],
           yAxis: 1
@@ -592,7 +597,13 @@ export class CandleStickComponent implements OnInit {
     }
     for (i = 0; i < indicators.length; i += 1) {
       const indicatorName = indicators[i];
-      if (this.indicators.has(indicatorName)) {
+      if (indicatorName.startsWith('TREND')) {
+        this.indicators.forEach((value, key) => {
+          if (key.startsWith(indicatorName + '_')) {
+            this.chart.series[value].show();
+          }
+        });
+      } else if (this.indicators.has(indicatorName)) {
         this.chart.series[this.indicators.get(indicatorName)].show();
         if (this.indicatorLabels.get(indicatorName).label === 'RSI') {
           this.chart.yAxis[this.OSCILLATOR_AXIS].options.plotLines[0].value = 30;
