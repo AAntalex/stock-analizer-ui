@@ -28,6 +28,8 @@ import { DatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TableQuotesComponent } from './components/shared/table-quotes/table-quotes.component';
+import { IconButtonComponent } from './components/shared/icon-button/icon-button.component';
+import { InputComponent } from './components/shared/input/input.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,8 @@ import { TableQuotesComponent } from './components/shared/table-quotes/table-quo
     ModalNotificationComponent,
     CdkDragDropComponent,
     TableQuotesComponent,
+    IconButtonComponent,
+    InputComponent,
   ],
   imports: [
     BrowserModule,

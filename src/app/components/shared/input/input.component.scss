@@ -1,0 +1,20 @@
+.my-input {
+  .mat-form-field {
+    width: 60px;
+    height: 20px;
+
+    padding: 0 10px;
+    font-size: 14px;
+    font-style: italic;
+    .mat-input-element {
+      caret-color : #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 0 1px #13b3ff, 0 0 0 2px #13b3ff
+      , inset 0px 0px 10px #13b3ff, 0px 0px 20px #20b7ff, 0px 0px 15px #6dd1ff;
+      border: 1px solid #63cdff;
+      color: #63cdff;
+      text-shadow: 0 0 0 1px #13b3ff, 0 0 0 2px #13b3ff;
+
+    }
+  }
+}

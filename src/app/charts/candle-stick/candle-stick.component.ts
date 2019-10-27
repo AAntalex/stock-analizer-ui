@@ -32,6 +32,10 @@ export class CandleStickComponent implements OnInit {
   public selectedCandleType = 'ALL';
   public selectedIndicators = [];
   public repeatLoad = false;
+  public skipNext = 'skip_next';
+  public skipPrevious = 'skip_previous';
+  public timeStep = 3600;
+  public inputType = "number";
 
   dateBegin: Date = new Date();
   TREND_AXIS = 0;
@@ -58,6 +62,9 @@ export class CandleStickComponent implements OnInit {
     this.secClass = this.dataClass ? this.dataClass.secClass : 'SBER';
     this.selectedSecClass = this.dataClass ? this.dataClass.selectedSecClass : 'Сбербанк (SBER)';
 
+    if (localStorage.getItem('dateEnd')) {
+      this.dateEnd = new Date(localStorage.getItem('dateEnd'));
+    }
     if (localStorage.getItem('startDate')) {
       this.startDate = new Date(localStorage.getItem('startDate'));
     } else {
@@ -104,9 +111,14 @@ export class CandleStickComponent implements OnInit {
     this.initData();
   }
 
-  initData() {
+  initIndicators() {
     this.listIndicators.length = 0;
     this.indicators.clear();
+    this.indicatorLabels.clear();
+  }
+
+  initData() {
+    this.initIndicators();
     this.quotes.clear();
     this.setChart();
     this.onCandleTypeChange(this.selectedCandleType);
@@ -133,6 +145,7 @@ export class CandleStickComponent implements OnInit {
               this.chart.series[i].removePoint(lastIdx, false);
             }
           }
+          const initData = this.dateBegin === this.startDate;
           if (this.dateBegin.getTime() < lastDate) {
             this.dateBegin = new Date(lastDate);
           }
@@ -219,11 +232,13 @@ export class CandleStickComponent implements OnInit {
                   color: dataChart[i].indicators[j].type === 'TREND' ? '#fff' : null,
                 }, false);
               }
-              const indicatorIndex = this.indicators.get(indicatorCode);
-              this.chart.series[indicatorIndex].addPoint([
-                dataChart[i].date,
-                dataChart[i].indicators[j].value
-              ], false);
+              if (initData || dataChart[i].indicators[j].name !== 'TREND') {
+                const indicatorIndex = this.indicators.get(indicatorCode);
+                this.chart.series[indicatorIndex].addPoint([
+                  dataChart[i].date,
+                  dataChart[i].indicators[j].value
+                ], false);
+              }
             }
             this.quotes.set(dataChart[i].date, dataChart[i].quotes);
           }
@@ -261,13 +276,7 @@ export class CandleStickComponent implements OnInit {
               if (that.progress.isActive() || !that.repeatLoad) {
                 return;
               }
-              if (that.dateEnd < that.dateBegin) {
-                that.dateEnd = new Date(that.dateBegin.getTime() + 1000);
-              } else {
-                if (that.dateEnd) {
-                  that.dateEnd = new Date(that.dateEnd.getTime() + 1000);
-                }
-              }
+              that.getNextTime(1);
               that.updateDataChart(that.secClass, that.dateBegin, that.dateEnd, that.stockClass, that.approximation);
             }, 1000);
           }
@@ -547,6 +556,7 @@ export class CandleStickComponent implements OnInit {
     if (this.dateEnd !== date) {
       this.dateEnd = date;
       this.dateBegin = this.startDate;
+      localStorage.setItem('dateEnd', date);
       this.initData();
     }
   }
@@ -624,5 +634,26 @@ export class CandleStickComponent implements OnInit {
     } else if (indicator === 'ATR') {
       this.chart.addIndicator(this.atr_data);
     }
+  }
+
+  getNextTime(seconds: number) {
+    if (this.dateEnd < this.dateBegin) {
+      this.dateEnd = new Date(this.dateBegin.getTime() + 1000 * seconds);
+    } else {
+      if (this.dateEnd) {
+        this.dateEnd = new Date(this.dateEnd.getTime() + 1000 * seconds);
+      }
+    }
+  }
+
+  onClickNext() {
+    this.getNextTime(this.timeStep);
+    this.updateDataChart(this.secClass, this.dateBegin, this.dateEnd, this.stockClass, this.approximation);
+  }
+
+  onClickPrevious() {
+    this.dateEnd = new Date(this.dateBegin.getTime() - 1000 * this.timeStep);
+    this.dateBegin = this.startDate;
+    this.initData();
   }
 }

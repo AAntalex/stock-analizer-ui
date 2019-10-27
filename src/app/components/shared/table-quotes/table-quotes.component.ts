@@ -9,7 +9,7 @@ import {QuotesService} from '../../../services/quotes.service';
 export class TableQuotesComponent implements OnInit {
   @Input() height = 300;
   dataSource = [];
-  displayedColumns: string[] = ['bid-open', 'bid-close', 'price', 'offer-open', 'offer-close', 'volume'];
+  displayedColumns: string[] = ['bid-change', 'bid-close', 'price', 'offer-close', 'offer-change', 'volume'];
 
   constructor(private quotesService: QuotesService) { }
 
@@ -21,4 +21,16 @@ export class TableQuotesComponent implements OnInit {
     });
   }
 
+  getValue(value) {
+    return value > 0 ? value : '';
+  }
+
+  getDiv(value) {
+    if (value > 0) {
+      return '+' + value;
+    } else if (value < 0) {
+      return '-' + value;
+    }
+    return '';
+  }
 }

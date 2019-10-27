@@ -1,0 +1,11 @@
+.my-mat-drawer-container {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
+.my-sidenav-content {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}

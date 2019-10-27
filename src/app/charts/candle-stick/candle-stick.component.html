@@ -7,6 +7,15 @@
   </app-toggle-button>
   <app-date-time-picker [date]="startDate" (onSelect)="onDateBeginSelect($event)" ></app-date-time-picker>
   <app-date-time-picker [date]="dateEnd" (onSelect)="onDateEndSelect($event)" ></app-date-time-picker>
+  <app-input [type]="inputType" [value]="timeStep"></app-input>
+  <app-icon-button
+    [icon]="skipPrevious"
+    (click)="onClickPrevious()">
+  </app-icon-button>
+  <app-icon-button
+    [icon]="skipNext"
+    (click)="onClickNext()">
+  </app-icon-button>
   <app-toggle-button
     [icons]="repeatLoadIcon"
     [switchOff]="true"
@@ -17,9 +26,8 @@
     [value]="selectedSecClass"
     (onChange)="onClassChange($event)">
   </app-autocomplete>
-  <app-cdk-drag-drop></app-cdk-drag-drop>
 </div>
-
+<app-cdk-drag-drop></app-cdk-drag-drop>
 <div class="select_indicator_div">
   <app-toggle-button
     [values]="listIndicators2"
