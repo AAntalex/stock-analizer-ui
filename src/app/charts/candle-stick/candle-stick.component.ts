@@ -34,8 +34,10 @@ export class CandleStickComponent implements OnInit {
   public repeatLoad = false;
   public skipNext = 'skip_next';
   public skipPrevious = 'skip_previous';
-  public timeStep = 3600;
-  public inputType = "number";
+
+  timeStep = 3600;
+  inputNumberType = "number";
+  approximation = '2';
 
   dateBegin: Date = new Date();
   TREND_AXIS = 0;
@@ -44,7 +46,6 @@ export class CandleStickComponent implements OnInit {
   indicatorLabels = new Map();
   indicators = new Map();
   dateEnd = null;
-  approximation = '2';
   indicatorOffset = 0;
   maxPrice = null;
   minPrice = null;
@@ -61,7 +62,6 @@ export class CandleStickComponent implements OnInit {
     this.stockClass = this.dataClass ? this.dataClass.stockClass : 'TQBR';
     this.secClass = this.dataClass ? this.dataClass.secClass : 'SBER';
     this.selectedSecClass = this.dataClass ? this.dataClass.selectedSecClass : 'Сбербанк (SBER)';
-
     if (localStorage.getItem('dateEnd')) {
       this.dateEnd = new Date(localStorage.getItem('dateEnd'));
     }
@@ -69,6 +69,12 @@ export class CandleStickComponent implements OnInit {
       this.startDate = new Date(localStorage.getItem('startDate'));
     } else {
       this.startDate.setHours(10, 0, 0, 0);
+    }
+    if (localStorage.getItem('timeStep')) {
+      this.timeStep = parseInt(localStorage.getItem('timeStep'));
+    }
+    if (localStorage.getItem('approximation')) {
+      this.approximation = localStorage.getItem('approximation');
     }
   }
 
@@ -646,14 +652,29 @@ export class CandleStickComponent implements OnInit {
     }
   }
 
+  onChangeTimeStep(timeStep) {
+    this.timeStep = timeStep;
+  }
+
+  onChangeApproximation(approximation) {
+    this.approximation = approximation + "";
+    localStorage.setItem('approximation', this.approximation);
+    this.dateBegin = this.startDate;
+    this.initData();
+  }
+
   onClickNext() {
     this.getNextTime(this.timeStep);
+    localStorage.setItem('dateEnd', this.dateEnd);
+    localStorage.setItem('timeStep', this.timeStep + "");
     this.updateDataChart(this.secClass, this.dateBegin, this.dateEnd, this.stockClass, this.approximation);
   }
 
   onClickPrevious() {
     this.dateEnd = new Date(this.dateBegin.getTime() - 1000 * this.timeStep);
     this.dateBegin = this.startDate;
+    localStorage.setItem('timeStep', this.timeStep + "");
+    localStorage.setItem('dateEnd', this.dateEnd);
     this.initData();
   }
 }
