@@ -21,6 +21,11 @@
     [icon]="skipNext"
     (click)="onClickNext()">
   </app-icon-button>
+  <app-icon-button
+    [icon]="computer"
+    [disabled]="disableTest"
+    (click)="onClickTest()">
+  </app-icon-button>
   <app-toggle-button
     [icons]="repeatLoadIcon"
     [switchOff]="true"

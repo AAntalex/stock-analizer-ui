@@ -33,7 +33,9 @@ export class CandleStickComponent implements OnInit {
   public selectedIndicators = [];
   public repeatLoad = false;
   public skipNext = 'skip_next';
+  public computer = 'computer';
   public skipPrevious = 'skip_previous';
+  public disableTest = false;
 
   timeStep = 3600;
   inputNumberType = "number";
@@ -676,5 +678,13 @@ export class CandleStickComponent implements OnInit {
     localStorage.setItem('timeStep', this.timeStep + "");
     localStorage.setItem('dateEnd', this.dateEnd);
     this.initData();
+  }
+
+  onClickTest() {
+    if (this.disableTest === false) {
+      this.disableTest = true;
+      this.dataService.getTestData(this.secClass, this.startDate, this.dateEnd, this.stockClass, this.approximation)
+        .subscribe(() => this.disableTest = false)
+    }
   }
 }

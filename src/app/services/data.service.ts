@@ -39,6 +39,24 @@ export class DataService {
       );
   }
 
+  public getTestData(secClass: string, dateBegin: Date, dateEnd?: Date, stockClass?: string, approximation?: string) {
+    let params = new HttpParams()
+      .set("secClass", secClass)
+      .set("sDateBegin", moment(dateBegin).format(this.dateFormat))
+      .set("sDateEnd", dateEnd ? moment(dateEnd).format(this.dateFormat) : '')
+      .set("stockClass", stockClass)
+      .set("approximation", approximation)
+    ;
+    return this.rest.getRestEndpoint('test', params)
+      .pipe(
+        catchError(err => of([])),
+        finalize(() => this.progress.hide()),
+        mergeMap(resp => from(resp)),
+        map(a => { return a as any; }),
+        toArray()
+      );
+  }
+
   public getClasses() {
     return this.rest.getRestEndpoint('stock/classes')
       .pipe(
