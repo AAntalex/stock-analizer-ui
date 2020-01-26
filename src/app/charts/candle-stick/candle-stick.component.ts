@@ -200,6 +200,14 @@ export class CandleStickComponent implements OnInit {
               ], false);
             }
             let j;
+            for (j = 0; j < dataChart[i].dealHistory.length; j += 1) {
+              const seriesIdx = dataChart[i].dealHistory[j].type === 'BUY' ? 6 : 7;
+              this.chart.series[seriesIdx].addPoint({
+                x: dataChart[i].date,
+                title: dataChart[i].dealHistory[j].price,
+                text: dataChart[i].dealHistory[j].type
+              }, false);
+            }
             for (j = 0; j < dataChart[i].indicators.length; j += 1) {
               const indicatorCode = dataChart[i].indicators[j].code;
               if (!this.indicatorOffset) {
@@ -253,6 +261,8 @@ export class CandleStickComponent implements OnInit {
           this.curQoutesIdx = dataChart[dataChart.length - 1].date;
           this.quotesService.setQuotes(this.quotes.get(this.curQoutesIdx));
         }
+
+
         this.chart.yAxis[0].options.plotLines[0].value = this.maxPrice;
         this.chart.yAxis[0].options.plotLines[0].label.text = this.maxPrice + ' ( +' + this.maxPercent + '% )';
         this.chart.yAxis[0].options.plotLines[1].value = this.minPrice;
@@ -294,7 +304,7 @@ export class CandleStickComponent implements OnInit {
         candlestick: {
           color: '#ff0000',
           upColor: '#00ff00',
-          lineColor: '#63cdff'
+          lineColor: '#63cdff',
         },
       },
       rangeSelector: {
@@ -510,6 +520,9 @@ export class CandleStickComponent implements OnInit {
           type: 'candlestick',
           id: this.secClass,
           data: [],
+          marker: {
+            symbol: 'triangle'
+          },
         }, {
           type: 'column',
           id: this.secClass + 'trend',
@@ -540,11 +553,21 @@ export class CandleStickComponent implements OnInit {
           data: [],
           color: '#ff0000',
           yAxis: 1
+        }, {
+          type: 'flags',
+          data: [],
+          color: '#00ff00',
+          shape: 'squarepin',
+        }, {
+          type: 'flags',
+          data: [],
+          color: '#ff0000',
+          shape: 'squarepin',
         }]
     });
   }
 
-  onClassChange(event) {
+onClassChange(event) {
     const secClass = event.value.substring(event.value.indexOf('(') + 1, event.value.indexOf(')'));
     if (this.stockClass !== event.group || this.secClass !== secClass) {
       this.stockClass = event.group;
